@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scripter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        #scriptContainer {
+            width: calc(210mm - 5em);
+            min-height: 297mm;
+            padding: 20mm 5em 20mm 20mm;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 12pt;
+            line-height: 1.5;
+        }
+
+        .script-block {
+            width: 100%;
+            margin-bottom: 0;
+            font-family: inherit;
+            font-size: inherit;
+            line-height: inherit;
+            resize: none;
+            overflow: hidden;
+            border: none;
+        }
+
+        button {
+            margin: 0 5px;
+        }
+    </style>
+    <script src="script.js"></script>
+</head>
+
+<body>
+    <div id="scriptContainer"></div>
+</body>
+
+</html>
