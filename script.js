@@ -1,3 +1,4 @@
+let sceneNumber = 1;
 let lastFocusedBlock = null;
 let blocks = [];
 
@@ -237,6 +238,7 @@ function loadScript() {
         const blockContents = content.split('\n');
         document.getElementById('scriptContainer').innerHTML = '';
         blocks = [];
+        sceneNumber = 1; // Reset scene number
         blockContents.forEach(blockContent => {
             const [tag, text] = blockContent.split(':');
             createNewBlock();
@@ -244,13 +246,18 @@ function loadScript() {
             lastBlock.value = text;
             applyTagFormatting(lastBlock, tag);
             adjustHeight(lastBlock);
+            
+            // Update scene number if this is a scene block
+            if (tag.toLowerCase() === 'scene') {
+                sceneNumber++;
+            }
         });
+        updateSceneNumbers();
         alert('Script loaded!');
     } else {
         alert('No saved script found.');
     }
 }
-
 function createTagSelector() {
     const selector = document.createElement('select');
     selector.className = 'tag-selector';
@@ -267,10 +274,16 @@ function createTagSelector() {
 function applyTagFormatting() {
     if (lastFocusedBlock) {
         const tag = document.getElementById('globalTagSelector').value;
+        const previousTag = lastFocusedBlock.className.split(' ').find(cls => cls.startsWith('tag-'))?.split('-')[1];
 
         // Remove parentheses if changing from stage direction
         if (lastFocusedBlock.classList.contains('tag-stage-direction')) {
             lastFocusedBlock.value = lastFocusedBlock.value.replace(/^\(|\)$/g, '');
+        }
+
+        // Remove scene number if changing from scene to another tag
+        if (previousTag === 'scene' && tag.toLowerCase() !== 'scene') {
+            lastFocusedBlock.value = lastFocusedBlock.value.replace(/^\d+\.\s*/, '');
         }
 
         // Reset all styles
@@ -334,10 +347,13 @@ function applyTagFormatting() {
             case 'text':
                 break;
         }
-    }
-}
 
-function updateGlobalTagSelector(block) {
+        // Update scene numbers if the tag was changed to or from 'scene'
+        if (tag.toLowerCase() === 'scene' || previousTag === 'scene') {
+            updateSceneNumbers();
+        }
+    }
+}function updateGlobalTagSelector(block) {
     const globalTagSelector = document.getElementById('globalTagSelector');
     const tag = block.className.split(' ').find(cls => cls.startsWith('tag-'))?.split('-')[1] || 'default';
     globalTagSelector.value = tag;
@@ -356,4 +372,21 @@ function handleGlobalKeyDown(event) {
             }
         }
     }
+}
+
+function updateSceneNumbers() {
+    let currentSceneNumber = 1;
+    blocks.forEach(block => {
+        if (block.classList.contains('tag-scene')) {
+            const sceneText = block.value.replace(/^\d+\.\s*/, '');
+            block.value = `${currentSceneNumber++}. ${sceneText}`;
+        } else {
+            // Preserve scene numbers in non-scene blocks
+            const match = block.value.match(/^(\d+\.\s*)(.*)/);
+            if (match) {
+                block.value = match[2]; // Keep the text without the number
+                currentSceneNumber = parseInt(match[1]) + 1; // Update the scene counter
+            }
+        }
+    });
 }
